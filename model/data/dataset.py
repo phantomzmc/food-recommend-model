@@ -82,19 +82,40 @@ class FoodDataset:
         return self.foods_df[self.foods_df['food_id'] == food_id].index[0]
 
     def get_food_details(self, food_ids):
+        print(f"🔥 get food detail")
         """ดึงรายละเอียดของอาหารตามรหัส"""
         result = []
-        for food_id in food_ids:
-            food = self.foods_df[self.foods_df['food_id'] == food_id].iloc[0]
-            result.append({
-                'id': int(food_id),
-                'name': food['name'],
-                'category': food['category'],
-                'spicy_level': int(food['spicy_level']),
-                'price': int(food['price'])
-            })
-        return result
 
+        # ลองปริ้นช่วงนี้เพื่อดูข้อมูล
+        print(f"Food IDs: {food_ids}")
+        print(f"Available food_ids in DataFrame: {self.foods_df['food_id'].unique()}")
+
+        for food_id in food_ids:
+            # ลองแปลง food_id เป็น int (หรือแปลงเป็นประเภทเดียวกับในDataFrame)
+            try:
+                food_id = int(food_id)  # หรือ str(food_id) ขึ้นอยู่กับประเภทข้อมูลใน DataFrame
+            except:
+                pass
+
+            print(food_id)
+            food = self.foods_df[self.foods_df['food_id'] == food_id]
+            print(f"🍛 searching for food_id: {food_id}, found rows: {len(food)}")
+
+            if not food.empty:
+                # ใช้ .iloc[0] เพื่อเข้าถึงแถวแรก และ [column_name] เพื่อเข้าถึงค่าในคอลัมน์
+                food_row = food.iloc[0]
+                result.append({
+                    'id': int(food_id),
+                    'name': food_row['name'],
+                    'category': food_row['category'],
+                    'spicy_level': int(food_row['spicy_level']),
+                    'price': int(food_row['price'])
+                })
+            else:
+                print(f"⚠️ No food found with ID: {food_id}")
+
+        print(f"🔫 Result: {result}")
+        return result
     def get_random_foods(self, n):
         """สุ่มเลือกอาหาร n รายการ"""
         random_foods = self.foods_df.sample(n)
