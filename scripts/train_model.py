@@ -13,10 +13,10 @@ def train_model():
     path_file_ratings = os.path.join(BASE_DIR, "model/data/raw/ratings_10000.csv")
     # ตรวจสอบไฟล์ที่จำเป็น
     if not os.path.exists(path_file_foods):
-        raise FileNotFoundError("❌ ไม่พบไฟล์ model/data/raw/foods.csv กรุณาสร้างไฟล์นี้ก่อนรันเทรนโมเดล")
+        raise FileNotFoundError("❌ ไม่พบไฟล์ model/data/raw กรุณาสร้างไฟล์นี้ก่อนรันเทรนโมเดล")
 
     if not os.path.exists(path_file_ratings):
-        raise FileNotFoundError("❌ ไม่พบไฟล์ model/data/raw/user_ratings.csv กรุณาสร้างไฟล์นี้ก่อนรันเทรนโมเดล")
+        raise FileNotFoundError("❌ ไม่พบไฟล์ model/data/raw กรุณาสร้างไฟล์นี้ก่อนรันเทรนโมเดล")
 
     # โหลดข้อมูล
     dataset = FoodDataset(
