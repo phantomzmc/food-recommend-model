@@ -59,8 +59,7 @@ class FoodRecommender:
         """แนะนำอาหารตามมื้อสำหรับผู้ใช้"""
         # ดึงอาหารที่เหมาะกับมื้อที่ระบุ
         valid_food_ids = self.dataset.get_foods_by_meal(meal_time)
-
-        if not valid_food_ids:
+        if len(valid_food_ids) == 0:
             return self.random_recommendations_by_meal(meal_time, n)
 
         user_ratings = self.dataset.get_user_ratings(user_id)
