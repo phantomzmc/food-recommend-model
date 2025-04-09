@@ -1,4 +1,7 @@
+from typing import List
+
 from fastapi import FastAPI, HTTPException
+from fastapi.params import Query
 from pydantic import BaseModel
 import pandas as pd
 import joblib
@@ -34,13 +37,20 @@ class RecommendRequest(BaseModel):
 class RecommendRandomRequest(BaseModel):
     top_n: int = 5
 
+class RecommendResponse(BaseModel):
+    id: int
+    name: str
+    category: str
+    spicy_level: int
+    price: int
+    meal_time: str
 
 @app.get("/")
 def root():
     return {"message": "Welcome to the Food Recommendation API!"}
 
 
-@app.get("/foods/random")
+@app.get("/foods/random", response_model=List[RecommendResponse])
 def get_random_foods(n: int = 5):
     return dataset.get_random_foods(n)
 
@@ -51,7 +61,7 @@ def submit_rating(request: RatingRequest):
     return {"message": "Rating submitted successfully"}
 
 
-@app.post("/recommend")
+@app.post("/recommend", response_model=List[RecommendResponse])
 def get_recommendation(request: RecommendRequest):
     try:
         recommended_ids = FoodRecommender().recommend_for_user(request.user_id, request.top_n)
@@ -60,7 +70,7 @@ def get_recommendation(request: RecommendRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/recommend-random")
+@app.post("/recommend-random", response_model=List[RecommendResponse])
 def get_recommendation_random(request: RecommendRandomRequest):
     try:
         recommended_ids = FoodRecommender().random_recommendations(request.top_n)
@@ -68,3 +78,12 @@ def get_recommendation_random(request: RecommendRandomRequest):
         return {"recommendations": recommended_ids}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/recommend/by-meal", response_model=List[RecommendResponse])
+def get_recommendation_by_meal(
+    user_id:int = Query(1, description="User Id"),
+    meal_time: str = Query("มื้อเช้า", description="มื้ออาหารที่ต้องการ (มื้อเช้า, มื้อกลางวัน, มื้อเย็น, มื้อค่ำ)"),
+    n: int = Query(5, description="จำนวนคำแนะนำที่ต้องการ")
+    ):
+    """ขอคำแนะนำอาหารสำหรับผู้ใช้ตามมื้อ"""
+    return recommender.recommend_by_meal(user_id, meal_time, n)

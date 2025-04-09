@@ -71,3 +71,22 @@ class TestFoodRecommender:
         assert len(recommendations) == 5
         assert 'id' in recommendations[0]
         assert 'name' in recommendations[0]
+
+    def test_recommend_by_meal(self):
+        """ทดสอบการแนะนำอาหารตามมื้อ"""
+        dataset = FoodDataset()
+        recommender = FoodRecommender(dataset)
+
+        # ทดสอบการแนะนำสำหรับมื้อเช้า
+        breakfast_recs = recommender.recommend_by_meal(user_id=1, meal_time="มื้อเช้า", n=3)
+        print(breakfast_recs)
+        # ตรวจสอบผลลัพธ์
+        assert len(breakfast_recs) > 0
+        assert all("มื้อเช้า" in rec["meal_time"] for rec in breakfast_recs)
+
+        # ทดสอบการแนะนำสำหรับมื้อกลางวัน
+        lunch_recs = recommender.recommend_by_meal(user_id=1, meal_time="มื้อกลางวัน", n=3)
+
+        # ตรวจสอบผลลัพธ์
+        assert len(lunch_recs) > 0
+        assert all("มื้อกลางวัน" in rec["meal_time"] for rec in lunch_recs)
