@@ -20,7 +20,7 @@ def train_model():
 
     # โหลดข้อมูล
     dataset = FoodDataset(
-        foods_path=path_file_foods,
+        # foods_path=path_file_foods,
         ratings_path=path_file_ratings
     )
     # dataset = FoodDataset()

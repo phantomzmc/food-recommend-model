@@ -47,6 +47,15 @@ class FoodDataset:
                 'อาหารจานเดียว', 'อาหารจานเดียว', 'อาหารจานเดียว', 'อาหารจานเดียว', 'อาหารจานเดียว',
                 'แกง', 'แกง', 'อาหารจานเดียว', 'อาหารจานเดียว', 'อาหารจานเดียว',
                 'อาหารจานเดียว', 'อาหารจานด่วน', 'อาหารจานด่วน', 'อาหารจานเดียว', 'อาหารจานเดียว'
+            ],
+            'meal_time': [  # เพิ่มข้อมูลมื้ออาหาร
+                'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น',
+                'มื้อกลางวัน,มื้อเย็น',
+                'มื้อเช้า,มื้อค่ำ', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น',
+                'มื้อกลางวัน,มื้อเย็น',
+                'มื้อเช้า', 'มื้อเช้า,มื้อค่ำ', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น',
+                'มื้อกลางวัน', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น', 'มื้อกลางวัน,มื้อเย็น',
+                'มื้อกลางวัน,มื้อเย็น'
             ]
         }
         self.foods_df = pd.DataFrame(foods_data)
@@ -109,7 +118,8 @@ class FoodDataset:
                     'name': food_row['name'],
                     'category': food_row['category'],
                     'spicy_level': int(food_row['spicy_level']),
-                    'price': int(food_row['price'])
+                    'price': int(food_row['price']),
+                    'meal_time': food_row['meal_time']
                 })
             else:
                 print(f"⚠️ No food found with ID: {food_id}")
@@ -126,7 +136,8 @@ class FoodDataset:
                 'name': food['name'],
                 'category': food['category'],
                 'spicy_level': int(food['spicy_level']),
-                'price': int(food['price'])
+                'price': int(food['price']),
+                'meal_time': food['meal_time']
             })
         return result
 
@@ -154,3 +165,35 @@ class FoodDataset:
             }])
             self.ratings_df = pd.concat([self.ratings_df, new_rating], ignore_index=True)
         return True
+
+    def get_foods_by_meal(self, meal_time):
+        """ดึงรายการ food_id ที่เหมาะสำหรับมื้อที่ระบุ"""
+        # ใช้การค้นหาแบบ substring เนื่องจากข้อมูลมื้ออาหารถูกเก็บเป็นรายการที่คั่นด้วยเครื่องหมาย ,
+        meal_foods = self.foods_df[self.foods_df['meal_time'].str.contains(meal_time)]
+        return meal_foods['food_id'].values
+
+    def get_random_foods_by_meal(self, meal_time, n):
+        """สุ่มเลือกอาหาร n รายการตามมื้อ"""
+        # กรองอาหารตามมื้อก่อน แล้วสุ่มเลือก
+        meal_foods = self.foods_df[self.foods_df['meal_time'].str.contains(meal_time)]
+
+        # ถ้าไม่มีอาหารในมื้อนี้ ให้สุ่มจากทั้งหมด
+        if len(meal_foods) == 0:
+            return self.get_random_foods(n)
+
+        # ถ้ามีอาหารน้อยกว่าที่ต้องการ ให้ใช้ทั้งหมดที่มี
+        if len(meal_foods) < n:
+            n = len(meal_foods)
+
+        random_foods = meal_foods.sample(n)
+        result = []
+        for _, food in random_foods.iterrows():
+            result.append({
+                'id': int(food['food_id']),
+                'name': food['name'],
+                'category': food['category'],
+                'spicy_level': int(food['spicy_level']),
+                'price': int(food['price']),
+                'meal_time': food['meal_time']  # เพิ่มข้อมูลมื้ออาหารในผลลัพธ์
+            })
+        return result
