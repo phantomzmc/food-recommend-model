@@ -31,6 +31,9 @@ class RecommendRequest(BaseModel):
     user_id: int
     top_n: int = 5
 
+class RecommendRandomRequest(BaseModel):
+    top_n: int = 5
+
 
 @app.get("/")
 def root():
@@ -54,5 +57,14 @@ def get_recommendation(request: RecommendRequest):
         recommended_ids = FoodRecommender().recommend_for_user(request.user_id, request.top_n)
         # food_details = dataset.get_food_details(recommended_ids)
         return {"user_id": request.user_id, "recommendations": recommended_ids}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/recommend-random")
+def get_recommendation_random(request: RecommendRandomRequest):
+    try:
+        recommended_ids = FoodRecommender().random_recommendations(request.top_n)
+        # food_details = dataset.get_food_details(recommended_ids)
+        return {"recommendations": recommended_ids}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
