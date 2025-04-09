@@ -118,7 +118,8 @@ class FoodDataset:
                     'name': food_row['name'],
                     'category': food_row['category'],
                     'spicy_level': int(food_row['spicy_level']),
-                    'price': int(food_row['price'])
+                    'price': int(food_row['price']),
+                    'meal_time': food_row['meal_time']
                 })
             else:
                 print(f"⚠️ No food found with ID: {food_id}")
